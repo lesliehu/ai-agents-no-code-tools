@@ -329,6 +329,12 @@ def generate_captioned_video(
     kokoro_speed: Optional[float] = Form(
         1.0, description="Speed for kokoro TTS (default: 1.0)"
     ),
+    language: Optional[str] = Form(
+        None, description="Language for STT (e.g., 'en', 'hu')"
+    ),
+    stt_model_size: Optional[str] = Form(
+        "large-v3-turbo", description="STT model size (e.g., 'tiny', 'base', 'small', 'medium', 'large', 'large-v2', 'large-v3')"
+    ),
 ):
     """
     Generate a captioned video from text and background image.
@@ -378,8 +384,8 @@ def generate_captioned_video(
         tts_audio_id = audio_id
         if tts_audio_id:
             audio_path = storage.get_media_path(tts_audio_id)
-            stt = STT(model_size="tiny")
-            captions = stt.transcribe(audio_path=audio_path)[0]
+            stt = STT(model_size=stt_model_size)
+            captions = stt.transcribe(audio_path=audio_path, language=language)[0]
             builder.set_audio(audio_path)
         # generate TTS and set audio
         else:
